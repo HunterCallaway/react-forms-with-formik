@@ -8,25 +8,30 @@ function App({
 					 //These props are provided by Formik. See the docs for other options:
 					 //https://jaredpalmer.com/formik/docs/api/formik#initialvalues-values
 					 values,
-					 errors
+					 errors,
+					 touched,
+					 isSubmitting
 				 }) {
 	return (
 		<div className="App">
 			<header className="App-header">
 				<Form>
 					<div>
-						{ errors.email && <p>{errors.email}</p> }
+						{ touched.email && errors.email && <p>{errors.email}</p> }
 						<Field
 							type="email"
 							name="email"
 							placeholder="Email"
 						/>
 					</div>
-					<Field
-						type="password"
-						name="password"
-						placeholder="Password"
-					/>
+					<div>
+						{ touched.password && errors.password && <p>{errors.password}</p> }
+						<Field
+							type="password"
+							name="password"
+							placeholder="Password"
+						/>
+					</div>
 					<label>
 						<Field
 							type="checkbox"
@@ -39,7 +44,7 @@ function App({
 						<option value="free">Free</option>
 						<option value="premium">Premium</option>
 					</Field>
-					<button>Submit</button>
+					<button disabled={isSubmitting}>Submit</button>
 				</Form>
 			</header>
 		</div>
@@ -61,16 +66,28 @@ export const FormikApp = withFormik({
 	validationSchema: Yup.object().shape({
 		email: Yup
 			.string()
-			.email()
-			.required(),
+			.email('The email address you entered is not valid.')
+			.required('Your email address is required.'),
 		password: Yup
 			.string()
-			.min(8)
-			.required()
+			.min(8, 'The password must be eight characters long.')
+			.required('A password is required.')
 	}),
 	//This function executes after the user clicks the 'Submit' button.
-	handleSubmit(values) {
-		console.log(values)
+	//Note: resetForm, setErrors, and setSubmitting are part of the "Formikbag".
+	//See more here: https://jaredpalmer.com/formik/docs/api/formik#onsubmit-values-values-formikbag-formikbag-void
+	handleSubmit(values, {resetForm, setErrors, setSubmitting}) {
+		//Asynchronous request
+		setTimeout(() => {
+			if(values.email === 'hunter@test.io') {
+				setErrors({email: 'That email is already taken.'})
+			} else {
+				resetForm();
+			}
+			//Prevent the user from clicking the submit button again
+			//until the timeout has finished.
+			setSubmitting(false)
+		}, 2000);
 	}
 })(App);
 
