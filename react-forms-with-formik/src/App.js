@@ -1,9 +1,12 @@
 import React from 'react';
 import './App.css';
-import {withFormik} from "formik";
+import {withFormik, Form} from "formik";
 import Yup from 'yup';
 
 function App({
+	//Destructure the props.
+	//These props are provided by Formik. See the docs for other options:
+	//https://jaredpalmer.com/formik/docs/api/formik#initialvalues-values
 	values,
 	handleChange,
 	handleSubmit
@@ -11,7 +14,7 @@ function App({
   return (
     <div className="App">
       <header className="App-header">
-        <form onSubmit={handleSubmit}>
+        <Form>
            <input
               type ="email"
               name="email"
@@ -27,19 +30,22 @@ function App({
 				  onChange={handleChange}
 			  />
 			  <button>Submit</button>
-        </form>
+        </Form>
       </header>
     </div>
   );
 }
 
+//Connect the functional component App to Formik.
 export const FormikApp = withFormik({
+	//Set-up the initial values for the fields.
 	mapPropsToValues({email, password}) {
 		return {
 			email: email || '',
 			password: password || ''
 		}
 	},
+	//This function executes after the user clicks the 'Submit' button.
 	handleSubmit(values) {
 		console.log(values)
 	}
